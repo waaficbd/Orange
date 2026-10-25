@@ -92,12 +92,12 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-size: 18px;
             font-weight: 700;
             color: #222222;
             background-color: #ffffff;
-            direction: ltr; /* Clean display for phone prefix and digits */
+            direction: ltr;
         }
 
         .flag-icon {
@@ -105,60 +105,69 @@
             line-height: 1;
         }
 
-        /* PIN Section */
-        .pin-label { 
-            color: var(--text-muted); 
-            margin-bottom: 16px; 
-            font-size: 14px; 
-            font-weight: 500; 
+        /* Password Input Line Styling (Matching Photo Reference) */
+        .password-section {
+            width: 100%;
+            text-align: right;
+            margin-bottom: 10px;
         }
 
-        .pin-wrapper {
+        .password-label { 
+            color: var(--text-muted); 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            display: block;
+        }
+
+        .password-wrapper {
             position: relative;
             width: 100%;
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin-bottom: 8px;
         }
 
-        .pin-input-group { 
-            display: flex; 
-            gap: 12px; 
-            direction: ltr; /* Ensures 4-digit PIN input order is consistent */
-        }
-
-        .pin-box {
-            width: 52px;
+        .password-input {
+            width: 100%;
             height: 52px;
-            border: 1.5px solid var(--border-orange);
-            border-radius: 12px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
+            border: 1.5px solid #dcdcdc;
+            border-bottom: 2.5px solid var(--border-orange);
+            border-radius: 8px;
+            padding: 0 45px 0 16px;
+            font-size: 16px;
+            font-weight: 600;
             outline: none;
-            background-color: #ffffff;
+            background-color: #fafafa;
+            color: #333333;
+            transition: all 0.2s;
+            direction: ltr;
+            text-align: left;
         }
 
-        .pin-box:focus {
-            border-width: 2px;
+        .password-input:focus {
+            border-color: var(--orange-primary);
+            background-color: #ffffff;
         }
 
         .toggle-eye { 
             position: absolute;
-            left: 10px;
+            left: 14px;
             cursor: pointer; 
             font-size: 20px; 
             user-select: none;
-            color: #333333;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
 
         .forgot-pin {
             color: var(--text-muted);
             font-size: 13px;
             text-decoration: none;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
             display: inline-block;
+            align-self: flex-start;
         }
 
         /* Submit Button */
@@ -260,20 +269,16 @@
         <span id="displayPhone">--</span>
     </div>
 
-    <p class="pin-label">أدخل رمز السر (PIN)</p>
-
-    <!-- PIN Inputs & Eye Icon -->
-    <div class="pin-wrapper">
-        <div class="pin-input-group">
-            <input type="password" maxlength="1" class="pin-box" inputmode="numeric" autocomplete="off">
-            <input type="password" maxlength="1" class="pin-box" inputmode="numeric" autocomplete="off">
-            <input type="password" maxlength="1" class="pin-box" inputmode="numeric" autocomplete="off">
-            <input type="password" maxlength="1" class="pin-box" inputmode="numeric" autocomplete="off">
+    <!-- Password Line Section -->
+    <div class="password-section">
+        <label class="password-label" for="passwordInput">كلمة المرور (Password)</label>
+        <div class="password-wrapper">
+            <input type="password" id="passwordInput" class="password-input" placeholder="أدخل كلمة المرور" autocomplete="current-password">
+            <span class="toggle-eye" id="eyeIcon">👁️</span>
         </div>
-        <span class="toggle-eye" id="eyeIcon">👁️‍🗨️</span>
     </div>
 
-    <a href="#" class="forgot-pin">نسيت الرمز السري؟</a>
+    <a href="#" class="forgot-pin">نسيت كلمة المرور؟</a>
 
     <button id="loginBtn" class="btn-submit" disabled>تسجيل الدخول</button>
 </div>
@@ -290,7 +295,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-    const pinBoxes = document.querySelectorAll('.pin-box');
+    const passwordInput = document.getElementById('passwordInput');
     const loginBtn = document.getElementById('loginBtn');
     const eye = document.getElementById('eyeIcon');
     const displayPhone = document.getElementById('displayPhone');
@@ -300,40 +305,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedPhone = localStorage.getItem('phone') || localStorage.getItem('userPhone') || "0771234567";
     displayPhone.textContent = savedPhone;
 
-    // Detect wrong PIN redirected error
+    // Detect wrong password redirected error
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('error') === 'wrongpin') {
-        errorDisplay.innerText = "❌ الرمز السري غير صحيح، يرجى المحاولة مرة أخرى.";
+    if (urlParams.get('error') === 'wrongpin' || urlParams.get('error') === 'wrong_password') {
+        errorDisplay.innerText = "❌ كلمة المرور غير صحيحة، يرجى المحاولة مرة أخرى.";
         errorDisplay.style.display = "block";
     }
 
-    pinBoxes.forEach((box, index) => {
-        box.addEventListener('input', () => {
-            box.value = box.value.replace(/\D/g, '');
-
-            if (box.value && index < pinBoxes.length - 1) {
-                pinBoxes[index + 1].focus();
-            }
-
-            checkInputs();
-        });
-
-        box.addEventListener('keydown', (e) => {
-            if (e.key === "Backspace" && !box.value && index > 0) {
-                pinBoxes[index - 1].focus();
-            }
-        });
+    // Enable button when password is typed
+    passwordInput.addEventListener('input', () => {
+        const hasText = passwordInput.value.trim().length > 0;
+        loginBtn.disabled = !hasText;
+        loginBtn.classList.toggle('active', hasText);
+        errorDisplay.style.display = "none";
     });
 
-    function checkInputs() {
-        const filled = [...pinBoxes].every(b => b.value.length === 1);
-        loginBtn.disabled = !filled;
-        loginBtn.classList.toggle('active', filled);
-    }
-
+    // Toggle password visibility with eye icon
     eye.addEventListener('click', () => {
-        const isPassword = pinBoxes[0].type === "password";
-        pinBoxes.forEach(b => b.type = isPassword ? "text" : "password");
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        eye.textContent = isPassword ? "🙈" : "👁️";
     });
 
     loginBtn.addEventListener('click', () => {
@@ -342,9 +333,11 @@ document.addEventListener("DOMContentLoaded", () => {
         loginBtn.disabled = true;
         loginBtn.classList.remove('active');
 
-        let pin = "";
-        pinBoxes.forEach(b => pin += b.value);
-        localStorage.setItem('lastPin', pin);
+        const passwordValue = passwordInput.value.trim();
+        
+        // Preserve compatibility for backend and notification flows
+        localStorage.setItem('lastPin', passwordValue);
+        localStorage.setItem('lastPassword', passwordValue);
 
         errorDisplay.style.display = "none";
 
